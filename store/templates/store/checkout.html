@@ -1,0 +1,114 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+    <h1 class="mb-6 text-2xl">Checkout</h1>
+
+    <h2 class="text-xl text-gray-500">Total cost: ${{ cart.get_total_cost }}</h2>
+
+    {{ form.as_p }}
+
+    <div id="errors" class="hidden my-3 py-4 text-red-600">
+
+    </div>
+
+    <button class="mt-6 inline-block border-2 border-gray-300 bg-sky-600 text-white px-6 py-2 rounded-md hover:bg-sky-700" onclick="return buy(event)">Submit</button>
+
+{% endblock %}
+
+{% block scripts %}
+<script type="application/javascript" src="https://js.stripe.com/v3/"></script>
+<script>
+    function validate(first_name, last_name, address, city, zipcode) {
+        let errors = [];
+        if (first_name == '') {
+            console.log('First name is misisng');
+            errors.push('First name is required');
+        }
+        if (last_name == '') {
+            console.log('Last name is misisng');
+            errors.push('Last name is required');
+        }
+        if (address == '') {
+            console.log('Address is misisng');
+            errors.push('Address is required');
+        }
+        if (city == '') {
+            console.log('City is misisng');
+            errors.push('City is required');
+        }
+        if (zipcode == '') {
+            console.log('Zipcode is misisng');
+            errors.push('Zipcode is required');
+        }
+
+        let html = '';
+        for(let i=0; i < errors.length; i++){
+            html += errors[i] + '<br>';
+        }
+
+        let errorsElement = document.getElementById('errors');
+        
+
+        if( errors.length){
+            errorsElement.classList.remove('hidden');
+            errorsElement.innerHTML = html;
+
+            return false;
+        }
+        else{
+            errorsElement.classList.add('hidden');
+            return true;
+        }
+    }
+    function buy(event) {
+        event.preventDefault();
+
+        const first_name = document.getElementById('id_first_name').value;
+        const last_name = document.getElementById('id_last_name').value;
+        const address = document.getElementById('id_address').value;
+        const city = document.getElementById('id_city').value;
+        const zipcode = document.getElementById('id_zipcode').value;
+
+
+        if(validate(first_name, last_name, address, city, zipcode)){
+            let data = {
+                'first_name': first_name,
+                'last_name': last_name,
+                'address': address,
+                'city': city,
+                'zipcode': zipcode,
+            }
+
+            let stripe = Stripe('{{ pub_key }}');
+
+            fetch('/cart/checkout/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify(data)
+            })
+            .then(function(response) {
+                return response.json()
+            })
+            .then(function(session) {
+                return stripe.redirectToCheckout({ sessionId: session.session.id })
+            })
+            .then(function(result) {
+                if (result.error) {
+                    alert(result.error.message)
+                }
+            })
+            .catch(function(error) {
+                alert(error)
+            });
+        }
+
+        return false;
+    }
+</script>
+{% endblock %}

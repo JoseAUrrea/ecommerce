@@ -1,0 +1,40 @@
+<style>
+    .product {
+        flex: 0 0 calc(33.333% - 1rem);
+        display: flex;
+        flex-direction: column;
+        margin: 0.5rem; 
+    }
+
+    .product .bg-gray-200 {
+        flex: 1; 
+        display: flex;
+        flex-direction: column;
+    }
+
+    .product .bg-gray-200 a {
+        display: flex; 
+        flex-direction: column; 
+        height: 100%; 
+    }
+
+    .image {
+        flex: 1;
+    }
+</style>
+
+<div class="flex flex-wrap">
+    {% for product in products %}
+        <div class="product">
+            <div class="bg-gray-100 py-2 px-2">
+                <a href="{% url 'product_detail' product.category.slug product.slug %}">
+                    <div class="image mb-2">
+                        <img src="{{ product.get_thumbnail }}" alt="Image of {{ product.title }}" class="w-full">
+                    </div>
+                    <h2 class="text-xl">{{ product.title }}</h2>
+                    <p class="text-xs text-gray-600"> {{ product.get_display_price }}</p>
+                </a>
+            </div>
+        </div>
+    {% endfor %}
+</div>

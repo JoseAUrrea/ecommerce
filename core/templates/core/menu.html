@@ -1,0 +1,45 @@
+<div class="dropdown">
+    <button id="categories-btn" class="flex items-center spacing-x-2 text-white">Categories
+       
+    </button>
+    <div id="categories-dropdown" class="mt-2 bg-gray-200 absolute w-30 px-4 py-2 dropdown-content">
+      {% for category in categories|dictsort:"title" %}
+        <a href="{% url 'category_detail' category.slug %}">{{ category.title }}</a>
+        <hr class="mt-2">
+      {% endfor %}
+    </div>
+</div>
+
+<a href="{% url 'about' %}" class="text-white">About</a>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const categoriesBtn = document.getElementById('categories-btn');
+        const categoriesDropdown = document.getElementById('categories-dropdown');
+
+        categoriesBtn.addEventListener('click', function() {
+            categoriesDropdown.classList.toggle('show');
+        });
+
+        // Close the dropdown when the user clicks outside of it
+        window.addEventListener('click', function(event) {
+            if (!event.target.matches('#categories-btn')) {
+                if (categoriesDropdown.classList.contains('show')) {
+                    categoriesDropdown.classList.remove('show');
+                }
+            }
+        });
+    });
+</script>
+
+<style>
+    #categories-dropdown {
+        display: none;
+        z-index: 1000; /* Adjust z-index as needed to ensure it's above other elements */
+    }
+
+    #categories-dropdown.show {
+        display: block;
+    }
+</style>
+

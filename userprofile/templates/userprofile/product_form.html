@@ -1,0 +1,19 @@
+{% extends 'core/base.html' %}
+
+{% block title %} {{title}} {% endblock %}
+{% block content %}
+    <h1 class="text-2xl"> {{title}} </h1>
+
+        <form method="post" action="." enctype="multipart/form-data" class="space-y-4">
+            {% csrf_token %}
+
+            {{ form.as_p }}
+
+            <button class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded">Submit</button>
+        </form>
+
+
+        {% if product %}
+            <a href="{% url 'delete_product' product.id %}" class="inline-block mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-6 rounded">Delete</a>
+        {% endif %}
+{% endblock %}
